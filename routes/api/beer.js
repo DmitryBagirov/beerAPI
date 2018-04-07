@@ -36,8 +36,12 @@ router.get('/download', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-router.get('/:id', (req, res) => {
-  Beer.findOne({ id: req.params.id })
+router.get('/:page/:limit', (req, res) => {
+  const { page, limit } = req.params;
+  console.log(page+" "+limit);
+  Beer.find({})
+    .skip(page > 0 ? ((page - 1) * limit) : 0)
+    .limit(Number(limit))
     .then((item) => {
       res.json(item);
     })
@@ -67,22 +71,22 @@ router.delete('/', (req, res) => {
 });
 
 router.patch('/:id', (req, res) => {
-  const {name, description, brewers_tips} = req.body;
+  const { name, description, brewers_tips } = req.body;
   Beer.findOneAndUpdate(
+    { id: req.params.id },
     {
-      id: req.params.id},
-    {
-      $set:{
+      $set: {
         name,
         description,
-        brewers_tips
-      }
-    }, {new: true})
+        brewers_tips,
+      },
+    }, { new: true },
+  )
     .then((doc) => {
       res.json(doc);
     })
     .catch((err) => {
-      res.status(202).json({ status: err });
+      res.status(404).json({ status: err });
     });
 });
 module.exports = router;
