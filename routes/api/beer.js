@@ -66,4 +66,20 @@ router.delete('/', (req, res) => {
     });
 });
 
+router.patch('/:id', (req, res) => {
+  Beer.findOneAndUpdate({id: req.params.id},
+	{
+	  $set:{
+	    name: req.body.name,
+	    description: req.body.description,
+	    brewers_tips: req.body.brewers_tips
+	  }
+	}, {upsert:true})
+    .then(() => {
+      res.json({ status: 'updated' });
+    })
+    .catch((err) => {
+      res.status(202).json({ status: err });
+    });
+});
 module.exports = router;
